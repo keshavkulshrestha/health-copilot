@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - DATABASE_URL=sqlite:///./medimind.db
+      - SECRET_KEY=medimind-docker-jwt-secret-key-prod-32chars
+      - FRONTEND_ORIGIN=http://localhost:5173
+      - STORAGE_PATH=./storage/documents
+      - MAX_UPLOAD_MB=25
+    volumes:
+      - ./backend/storage:/app/storage
+      - ./backend/medimind.db:/app/medimind.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

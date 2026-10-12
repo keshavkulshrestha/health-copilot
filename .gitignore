@@ -1,0 +1,1 @@
+﻿@('node_modules/', '.next/', '.env.local', '*.log', 'dist/', ".DS_Store)
